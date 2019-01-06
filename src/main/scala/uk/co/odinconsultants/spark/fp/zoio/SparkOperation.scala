@@ -11,8 +11,10 @@ sealed trait SparkOperation[+A] {
   def run(ctx: SparkContext): A
 
   // enables chaining pipelines, for comprehensions, etc.
-  def map[B](f: A => B): SparkOperation[B]
-  def flatMap[B](f: A => SparkOperation[B]): SparkOperation[B]
+  def map[B](f: A ⇒ B): SparkOperation[B] =
+    SparkOperation { ctx ⇒ f(this.run(ctx)) }
+  def flatMap[B](f: A ⇒ SparkOperation[B]): SparkOperation[B] =
+    SparkOperation { ctx ⇒ f(this.run(ctx)).run(ctx) }
 }
 
 object SparkOperation {

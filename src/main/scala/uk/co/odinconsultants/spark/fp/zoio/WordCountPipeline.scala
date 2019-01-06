@@ -1,5 +1,7 @@
 package uk.co.odinconsultants.spark.fp.zoio
 
+import SparkOperation._
+
 /**
   * Stolen from http://www.stephenzoio.com/creating-composable-data-pipelines-spark/
   */
