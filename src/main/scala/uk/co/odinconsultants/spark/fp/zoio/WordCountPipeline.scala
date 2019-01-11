@@ -13,7 +13,8 @@ trait WordCountPipeline {
 
   // initial SparkOperation created using companion object
   def linesOp = SparkOperation { sparkContext =>
-    sparkContext.textFile("/TXT/*")
+//    sparkContext.textFile("/TXT/*")
+    sparkContext.parallelize((1 to 100).map(i => s"Line $i"))
   }
 
   // after that we often just need map / flatMap
