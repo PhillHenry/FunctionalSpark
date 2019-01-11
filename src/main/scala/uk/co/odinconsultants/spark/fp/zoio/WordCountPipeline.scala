@@ -1,8 +1,7 @@
 package uk.co.odinconsultants.spark.fp.zoio
 
-import SparkOperation._
 import org.apache.spark.rdd.RDD
-import scalaz.Monad
+import uk.co.odinconsultants.spark.fp.zoio.SparkOperation._
 
 /**
   * Stolen from http://www.stephenzoio.com/creating-composable-data-pipelines-spark/
@@ -18,15 +17,15 @@ trait WordCountPipeline {
   }
 
   // after that we often just need map / flatMap
-  def wordsOp: SparkOperation[RDD[String]] = for (lines <- linesOp) yield {
+  def wordsOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[String]] = for (lines <- op) yield {
     lines.flatMap { line => line.split("\\W+") }
       .map(_.toLowerCase)
       .filter(!_.isEmpty)
   }
 
-  def countOp: SparkOperation[RDD[(String, Int)]] = for (words <- wordsOp)
+  def countOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[(String, Int)]] = for (words <- op)
     yield words.map((_, 1)).reduceByKey(_ + _)
 
-  def topWordsOp(n: Int): SparkOperation[Map[String, Int]] =
-    countOp.map(_.takeOrdered(n)(Ordering.by(-_._2)).toMap)
+  def topWordsOp(op: SparkOperation[RDD[(String, Int)]])(n: Int): SparkOperation[Map[String, Int]] =
+    op.map(_.takeOrdered(n)(Ordering.by(-_._2)).toMap)
 }
