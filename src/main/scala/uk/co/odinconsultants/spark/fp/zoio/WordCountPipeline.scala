@@ -45,12 +45,10 @@ trait WordCountPipeline {
 
   def countOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[(String, Int)]] = for (words <- op) yield count(words)
 
-//  def topT(n: Int): SparkMonadTransformer[String, (String, Int)]
-//    = ReaderTTry[SparkOpRdd[(String, Int)], SparkOperation[Map[String, Int]]] { op: SparkOpRdd[(String, Int)] =>
-//    val tops: SparkOperation[Map[String, Int]]  = topWordsOp(op)(n)
-//    toMonad(tops(n))
-//    ???
-//  }
+  def topT(n: Int): ReaderTTry[SparkOperation[RDD[(String, Int)]], SparkOperation[Map[String, Int]]]
+    = ReaderTTry[SparkOpRdd[(String, Int)], SparkOperation[Map[String, Int]]] { op: SparkOpRdd[(String, Int)] =>
+    toMonad(topWordsOp(op)(n))
+  }
 
   def topWordsOp(op: SparkOperation[RDD[(String, Int)]])(n: Int): SparkOperation[Map[String, Int]] =
     op.map(_.takeOrdered(n)(Ordering.by(-_._2)).toMap)
