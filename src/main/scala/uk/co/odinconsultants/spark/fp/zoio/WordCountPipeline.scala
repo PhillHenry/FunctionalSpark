@@ -30,7 +30,7 @@ trait WordCountPipeline {
 //    val fn: () => SparkOperation[RDD[String]] = () => linesOp
     Try(linesOp)
   }
-  
+
   def linesOp: SparkOperation[RDD[String]] = SparkOperation { sparkContext =>
     sparkContext.parallelize((1 to 100).map(i => s"Line $i"))
   }
