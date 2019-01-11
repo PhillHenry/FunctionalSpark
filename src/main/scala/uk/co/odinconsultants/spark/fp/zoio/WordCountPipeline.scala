@@ -10,9 +10,9 @@ import uk.co.odinconsultants.spark.fp.zoio.SparkOperation._
 trait WordCountPipeline {
 
   // see http://eed3si9n.com/learning-scalaz/Monad+transformers.html
-  type ReaderTSparkOperation[A, B] = ReaderT[SparkOperation, A, B]
-  object ReaderTSparkOperation extends KleisliInstances  {
-    def apply[A, B](f: A => SparkOperation[B]): ReaderTSparkOperation[A, B] = Kleisli(f)
+  type ReaderTOption[A, B] = ReaderT[Option, A, B]
+  object ReaderTOption extends KleisliInstances {
+    def apply[A, B](f: A => Option[B]): ReaderTOption[A, B] = Kleisli(f)
   }
 
   import scalaz.syntax.monad._
@@ -25,7 +25,8 @@ trait WordCountPipeline {
     .map(_.toLowerCase)
     .filter(!_.isEmpty)
 
-//  def wordsT(op: SparkOperation[RDD[String]]): ReaderTSparkOperation[RDD[String], RDD[String]] = ReaderTSparkOperation[RDD[String], RDD[String]] { rdd: RDD[String] => words(rdd) }
+  def wordsT: ReaderTOption[SparkOperation[RDD[String]], SparkOperation[RDD[String]]]
+    = ReaderTOption[SparkOperation[RDD[String]], SparkOperation[RDD[String]]] { op: SparkOperation[RDD[String]] => Option(wordsOp(op)) }
 
   def wordsOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[String]] = for (lines <- op) yield words(lines)
 
