@@ -8,23 +8,21 @@ import uk.co.odinconsultants.spark.fp.zoio.SparkOperation._
   */
 trait WordCountPipeline {
 
-  import scalaz.syntax.functor._
+  import scalaz.syntax.monad._
 
-  // initial SparkOperation created using companion object
-  def linesOp = SparkOperation { sparkContext =>
-//    sparkContext.textFile("/TXT/*")
+  def linesOp: SparkOperation[RDD[String]] = SparkOperation { sparkContext =>
     sparkContext.parallelize((1 to 100).map(i => s"Line $i"))
   }
 
-  // after that we often just need map / flatMap
-  def wordsOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[String]] = for (lines <- op) yield {
-    lines.flatMap { line => line.split("\\W+") }
-      .map(_.toLowerCase)
-      .filter(!_.isEmpty)
-  }
+  def words(lines: RDD[String]): RDD[String] = lines.flatMap { line => line.split("\\W+") }
+    .map(_.toLowerCase)
+    .filter(!_.isEmpty)
 
-  def countOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[(String, Int)]] = for (words <- op)
-    yield words.map((_, 1)).reduceByKey(_ + _)
+  def wordsOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[String]] = for (lines <- op) yield words(lines)
+
+  def count(words: RDD[String]): RDD[(String, Int)] = words.map((_, 1)).reduceByKey(_ + _)
+
+  def countOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[(String, Int)]] = for (words <- op) yield count(words)
 
   def topWordsOp(op: SparkOperation[RDD[(String, Int)]])(n: Int): SparkOperation[Map[String, Int]] =
     op.map(_.takeOrdered(n)(Ordering.by(-_._2)).toMap)
