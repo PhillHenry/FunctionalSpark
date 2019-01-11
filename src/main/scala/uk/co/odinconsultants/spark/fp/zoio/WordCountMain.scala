@@ -16,10 +16,10 @@ object WordCountMain extends WordCountPipeline {
     val topWordsMap:  Map[String, Int]                        = topFn(100).run(sc)
 
 //    val topMonad:  SparkOperation[Map[String, Int]] = for {
-//      lines   <- linesOp
-//      words   <- words(lines)
-//      counts  <- count(words)
-//      top     <- topWordsOp(counts)
+//      ls    <- linesOp        // we're inside the SparkOperation monad
+//      ws    <- words(ls)      // we're inside the RDD
+//      cs    <- count(ws)      // Kaboom! This doesn't work because we're flatMapping an RDD at this point
+//      top   <- topWordsOp(cs)
 //    } yield top(10)
 //    val topWordsMap:  Map[String, Int] = topMonad.run(sc)
 
