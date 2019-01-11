@@ -1,12 +1,19 @@
 package uk.co.odinconsultants.spark.fp.zoio
 
 import org.apache.spark.rdd.RDD
+import scalaz.{Kleisli, KleisliInstances, ReaderT}
 import uk.co.odinconsultants.spark.fp.zoio.SparkOperation._
 
 /**
   * Stolen from http://www.stephenzoio.com/creating-composable-data-pipelines-spark/
   */
 trait WordCountPipeline {
+
+  // see http://eed3si9n.com/learning-scalaz/Monad+transformers.html
+  type ReaderTSparkOperation[A, B] = ReaderT[SparkOperation, A, B]
+  object ReaderTSparkOperation extends KleisliInstances  {
+    def apply[A, B](f: A => SparkOperation[B]): ReaderTSparkOperation[A, B] = Kleisli(f)
+  }
 
   import scalaz.syntax.monad._
 
@@ -17,6 +24,8 @@ trait WordCountPipeline {
   def words(lines: RDD[String]): RDD[String] = lines.flatMap { line => line.split("\\W+") }
     .map(_.toLowerCase)
     .filter(!_.isEmpty)
+
+//  def wordsT(op: SparkOperation[RDD[String]]): ReaderTSparkOperation[RDD[String], RDD[String]] = ReaderTSparkOperation[RDD[String], RDD[String]] { rdd: RDD[String] => words(rdd) }
 
   def wordsOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[String]] = for (lines <- op) yield words(lines)
 
