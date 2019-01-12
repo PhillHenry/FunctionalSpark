@@ -27,8 +27,7 @@ trait WordCountPipeline {
 
   val linesT: ReaderTTry[Unit, SparkOperation[RDD[String]]]
     = ReaderTTry[Unit, SparkOpRdd[String]] { x =>
-//    val fn: () => SparkOperation[RDD[String]] = () => linesOp
-    Try(linesOp)
+    toMonad(linesOp)
   }
 
   def linesOp: SparkOperation[RDD[String]] = SparkOperation { sparkContext =>
