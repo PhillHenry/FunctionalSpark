@@ -1,10 +1,11 @@
-package uk.co.odinconsultants.spark.fp
+package uk.co.odinconsultants.spark.fp.zoio.actions
 
 import org.apache.spark.rdd.RDD
-import scalaz._
-import Scalaz._
+import scalaz.{Kleisli, KleisliInstances, ReaderT, \/}
+import scalaz.Scalaz._
+import uk.co.odinconsultants.spark.fp.zoio.SparkOperation
 
-package object zoio {
+package object Actions {
 
   type MyMonad[T] = \/[String, T]
 

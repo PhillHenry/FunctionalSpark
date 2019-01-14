@@ -2,6 +2,10 @@ package uk.co.odinconsultants.spark.fp.zoio.actions
 
 import org.apache.spark.rdd.RDD
 import uk.co.odinconsultants.spark.fp.zoio._
+import uk.co.odinconsultants.spark.fp.zoio.SparkOperation._
+import uk.co.odinconsultants.spark.fp.zoio.actions.Actions._
+import scalaz._
+import scalaz.Scalaz._
 
 object Count {
 
