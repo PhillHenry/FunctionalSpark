@@ -26,12 +26,19 @@ object WordCountMain {
 //    } yield top(10)
 //    val topWordsMap:  Map[String, Int] = topMonad.run(sc)
 
+    /*
+    val zoio = for {
+      ls <- linesOp   // RDD[String]
+      ws <- words(ls) // expects ws to be a SparkOperation
+    }  yield ws
+*/
 
     val x = for {
-      ls <- linesT
+//      t <- topT(10) // Kleisli[function1]
+      ls <- linesT // ls -> \/[String, SparkOperation[RDD[String]]]
     } yield ls
 
-    println(x.run(sc)) // a scalaz \/ (disjoint)
+    println(x)
 
 //    println(topWordsMap.mkString("\n"))
     sc.stop()
