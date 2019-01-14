@@ -11,7 +11,9 @@ import scala.util.Try
   */
 trait WordCountPipeline {
 
-  def toMonad[T](t: => T): Try[T] = Try(t)
+  type MyMonad[T] = Try[T]
+
+  def toMonad[T](t: => T): MyMonad[T] = Try(t)
 
   // see http://eed3si9n.com/learning-scalaz/Monad+transformers.html
   type ReaderTTry[A, B] = ReaderT[Try, A, B]
@@ -26,9 +28,8 @@ trait WordCountPipeline {
   import scalaz.syntax.monad._
 
   val linesT: ReaderTTry[Unit, SparkOperation[RDD[String]]]
-    = ReaderTTry[Unit, SparkOpRdd[String]] { x =>
-//    val fn: () => SparkOperation[RDD[String]] = () => linesOp
-    Try(linesOp)
+    = ReaderTTry[Unit, SparkOpRdd[String]] { _ =>
+    toMonad(linesOp)
   }
 
   def linesOp: SparkOperation[RDD[String]] = SparkOperation { sparkContext =>
