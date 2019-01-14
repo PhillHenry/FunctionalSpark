@@ -35,7 +35,8 @@ object WordCountMain {
 
     val x = for {
 //      t <- topT(10) // Kleisli[function1]
-      ls <- linesT // ls -> \/[String, SparkOperation[RDD[String]]]
+      ls <- linesT
+//      ws <- wordsT()
     } yield ls
 
     println(x)

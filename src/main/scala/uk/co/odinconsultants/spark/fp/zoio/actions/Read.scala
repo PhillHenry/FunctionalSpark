@@ -9,8 +9,8 @@ object Read {
 
   def read(sc: SparkContext): RDD[String] = sc.parallelize((1 to 100).map(i => s"Line $i"))
 
-  val linesT: ReaderTEither[Unit, SparkOperation[RDD[String]]] = ReaderTEither[Unit, SparkOpRdd[String]] { _ =>
-    toMonad(linesOp)
+  val linesT = ReaderTEither[SparkContext, RDD[String]] { sc =>
+    toMonad(read(sc))
   }
 
   def linesOp: SparkOperation[RDD[String]] = SparkOperation { sparkContext =>

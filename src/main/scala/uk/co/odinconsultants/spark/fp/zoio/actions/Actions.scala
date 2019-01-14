@@ -17,9 +17,5 @@ package object Actions {
     def apply[A, B](f: A => MyMonad[B]): ReaderTEither[A, B] = Kleisli(f)
   }
 
-  type SparkMonadTransformer[T, U] =  ReaderTEither[SparkOperation[RDD[T]], SparkOperation[RDD[U]]]
-
-  type SparkOpRdd[T] = SparkOperation[RDD[T]]
-
 
 }

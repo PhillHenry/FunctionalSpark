@@ -11,8 +11,7 @@ object Words {
     .map(_.toLowerCase)
     .filter(!_.isEmpty)
 
-  val wordsT: SparkMonadTransformer[String, String]
-    = ReaderTEither[SparkOpRdd[String], SparkOpRdd[String]] { op: SparkOpRdd[String] => toMonad(wordsOp(op)) }
+  val wordsT = ReaderTEither[RDD[String], RDD[String]] { rdd => toMonad(words(rdd)) }
 
   def wordsOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[String]] = for (lines <- op) yield words(lines)
 
