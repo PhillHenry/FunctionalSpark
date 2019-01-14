@@ -1,7 +1,8 @@
 package uk.co.odinconsultants.spark.fp.zoio
 
 import org.apache.spark.rdd.RDD
-import scalaz.{Kleisli, KleisliInstances, ReaderT}
+import scalaz._
+import Scalaz._
 import uk.co.odinconsultants.spark.fp.zoio.SparkOperation._
 
 import scala.util.Try
@@ -11,24 +12,24 @@ import scala.util.Try
   */
 trait WordCountPipeline {
 
-  type MyMonad[T] = Try[T]
+  type MyMonad[T] = \/[String, T]
 
-  def toMonad[T](t: => T): MyMonad[T] = Try(t)
+  def toMonad[T](t: => T): MyMonad[T] = t.right[String]
 
   // see http://eed3si9n.com/learning-scalaz/Monad+transformers.html
-  type ReaderTTry[A, B] = ReaderT[Try, A, B]
-  object ReaderTTry extends KleisliInstances {
-    def apply[A, B](f: A => Try[B]): ReaderTTry[A, B] = Kleisli(f)
+  type ReaderTEither[A, B] = ReaderT[MyMonad, A, B]
+  object ReaderTEither extends KleisliInstances {
+    def apply[A, B](f: A => MyMonad[B]): ReaderTEither[A, B] = Kleisli(f)
   }
 
-  type SparkMonadTransformer[T, U] =  ReaderTTry[SparkOperation[RDD[T]], SparkOperation[RDD[U]]]
+  type SparkMonadTransformer[T, U] =  ReaderTEither[SparkOperation[RDD[T]], SparkOperation[RDD[U]]]
 
   type SparkOpRdd[T] = SparkOperation[RDD[T]]
 
   import scalaz.syntax.monad._
 
-  val linesT: ReaderTTry[Unit, SparkOperation[RDD[String]]]
-    = ReaderTTry[Unit, SparkOpRdd[String]] { _ =>
+  val linesT: ReaderTEither[Unit, SparkOperation[RDD[String]]]
+    = ReaderTEither[Unit, SparkOpRdd[String]] { _ =>
     toMonad(linesOp)
   }
 
@@ -41,22 +42,23 @@ trait WordCountPipeline {
     .filter(!_.isEmpty)
 
   val wordsT: SparkMonadTransformer[String, String]
-    = ReaderTTry[SparkOpRdd[String], SparkOpRdd[String]] { op: SparkOpRdd[String] => toMonad(wordsOp(op)) }
+    = ReaderTEither[SparkOpRdd[String], SparkOpRdd[String]] { op: SparkOpRdd[String] => toMonad(wordsOp(op)) }
 
   def wordsOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[String]] = for (lines <- op) yield words(lines)
 
   val countT: SparkMonadTransformer[String, (String, Int)]
-    = ReaderTTry[SparkOpRdd[String], SparkOpRdd[(String, Int)]] { op: SparkOpRdd[String] => toMonad(countOp(op)) }
+    = ReaderTEither[SparkOpRdd[String], SparkOpRdd[(String, Int)]] { op: SparkOpRdd[String] => toMonad(countOp(op)) }
 
   def count(words: RDD[String]): RDD[(String, Int)] = words.map((_, 1)).reduceByKey(_ + _)
 
   def countOp(op: SparkOperation[RDD[String]]): SparkOperation[RDD[(String, Int)]] = for (words <- op) yield count(words)
 
-  def topT(n: Int): ReaderTTry[SparkOperation[RDD[(String, Int)]], SparkOperation[Map[String, Int]]]
-    = ReaderTTry[SparkOpRdd[(String, Int)], SparkOperation[Map[String, Int]]] { op: SparkOpRdd[(String, Int)] =>
+  def topT(n: Int): ReaderTEither[SparkOperation[RDD[(String, Int)]], SparkOperation[Map[String, Int]]]
+    = ReaderTEither[SparkOpRdd[(String, Int)], SparkOperation[Map[String, Int]]] { op: SparkOpRdd[(String, Int)] =>
     toMonad(topWordsOp(op)(n))
   }
 
-  def topWordsOp(op: SparkOperation[RDD[(String, Int)]])(n: Int): SparkOperation[Map[String, Int]] =
-    op.map(_.takeOrdered(n)(Ordering.by(-_._2)).toMap)
+  def topWordsOp(op: SparkOperation[RDD[(String, Int)]])(n: Int): SparkOperation[Map[String, Int]] = {
+    op.map(_.takeOrdered(n)(scala.Ordering.by(-_._2)).toMap)
+  }
 }
