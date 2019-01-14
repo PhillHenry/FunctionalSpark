@@ -34,10 +34,11 @@ object WordCountMain {
 */
 
     val x = for {
-//      t <- topT(10) // Kleisli[function1]
-      ls <- linesT
-//      ws <- wordsT()
-    } yield ls
+      ls <- linesT(sc)
+      ws <- wordsT(ls)
+      cs <- countT(ws)
+      ts <- topT(10)(cs)
+    } yield ts
 
     println(x)
 
