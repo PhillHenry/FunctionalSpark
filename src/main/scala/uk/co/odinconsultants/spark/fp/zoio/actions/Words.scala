@@ -1,8 +1,7 @@
-package uk.co.odinconsultants.spark.fp.zoio
+package uk.co.odinconsultants.spark.fp.zoio.actions
 
 import org.apache.spark.rdd.RDD
-import scalaz.Scalaz._
-import uk.co.odinconsultants.spark.fp.zoio.SparkOperation._
+import uk.co.odinconsultants.spark.fp.zoio._
 
 object Words {
 

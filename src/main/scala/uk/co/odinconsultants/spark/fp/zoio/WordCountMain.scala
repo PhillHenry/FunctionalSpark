@@ -2,10 +2,10 @@ package uk.co.odinconsultants.spark.fp.zoio
 
 import org.apache.spark.{SparkConf, SparkContext}
 import scalaz.syntax.monad._
-import uk.co.odinconsultants.spark.fp.zoio.Words._
-import uk.co.odinconsultants.spark.fp.zoio.Top._
-import uk.co.odinconsultants.spark.fp.zoio.Count._
-import uk.co.odinconsultants.spark.fp.zoio.Read._
+import uk.co.odinconsultants.spark.fp.zoio.actions.Words._
+import uk.co.odinconsultants.spark.fp.zoio.actions.Top._
+import uk.co.odinconsultants.spark.fp.zoio.actions.Count._
+import uk.co.odinconsultants.spark.fp.zoio.actions.Read._
 
 /**
   * Stolen from http://www.stephenzoio.com/creating-composable-data-pipelines-spark/

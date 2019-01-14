@@ -1,6 +1,7 @@
-package uk.co.odinconsultants.spark.fp.zoio
+package uk.co.odinconsultants.spark.fp.zoio.actions
 
 import org.apache.spark.rdd.RDD
+import uk.co.odinconsultants.spark.fp.zoio.{ReaderTEither, SparkOpRdd, SparkOperation, toMonad}
 
 object Read {
 
