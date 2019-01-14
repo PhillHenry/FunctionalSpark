@@ -36,39 +36,22 @@
       <version>1.10.19</version>
       <scope>test</scope>
     </dependency>
-<!--
-    <dependency>
-      <groupId>org.scalanlp</groupId>
-      <artifactId>breeze_${scala.compat.version}</artifactId>
-      <version>0.13.2</version>
-    </dependency>
--->
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
       <version>${scala.version}</version>
     </dependency>
-<!--
-    <dependency>
-      <groupId>org.scalautils</groupId>
-      <artifactId>scalautils_${scala.compat.version}</artifactId>
-      <version>2.1.7</version>
-    </dependency>
--->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-<!--
     <dependency>
-      <groupId>org.specs2</groupId>
-      <artifactId>specs2-core_${scala.compat.version}</artifactId>
-      <version>2.4.16</version>
-      <scope>test</scope>
+      <groupId>org.typelevel</groupId>
+      <artifactId>frameless-dataset_${scala.compat.version}</artifactId>
+      <version>0.8.0</version>
     </dependency>
--->
     <dependency>
       <groupId>org.scalatest</groupId>
       <artifactId>scalatest_${scala.compat.version}</artifactId>
