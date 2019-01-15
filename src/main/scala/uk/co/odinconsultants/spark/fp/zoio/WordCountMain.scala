@@ -7,6 +7,7 @@ import uk.co.odinconsultants.spark.fp.zoio.actions.Top._
 import uk.co.odinconsultants.spark.fp.zoio.actions.Words._
 import scalaz._
 import scalaz.Scalaz._
+import uk.co.odinconsultants.spark.fp.zoio.actions.Actions.MyMonad
 
 /**
   * Stolen from http://www.stephenzoio.com/creating-composable-data-pipelines-spark/
@@ -32,7 +33,7 @@ object WordCountMain {
   }
 
   private def monadTransformers(sc: SparkContext) = {
-    val x = for {
+    val x: MyMonad[Map[String, Int]] = for {
       ls <- linesT(sc)
       ws <- wordsT(ls)
       cs <- countT(ws)
