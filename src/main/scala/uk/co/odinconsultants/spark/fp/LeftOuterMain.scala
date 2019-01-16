@@ -30,10 +30,18 @@ object LeftOuterMain {
 
 //    import dsFoo.sqlContext.implicits._
 
-    val dsGrouped: KeyValueGroupedDataset[Foo, (Foo, Bar)] = dsFooBar.groupByKey(_._1) // we want Foos with all their Bars
-    val dsGroupedMapped: KeyValueGroupedDataset[Foo, Bar] =  dsGrouped.mapValues(_._2) //we don't need the Foos in the values because we have them in the keys
+    // If the schema is inferred from a Scala tuple/case class, or a Java bean, please try to use scala.Option[_] or other nullable types (e.g. java.lang.Integer instead of int/scala.Int).
 
-    dsGroupedMapped.mapGroups( (foo:Foo, bars:Iterator[Bar]) => foo -> bars.toList).show //Baaaam explodes because (I think) Foo("x") has no Bar
+    val toBars: ((Foo, Bar)) => Option[Bar] = { case(_, b) => if (b == null) None else Some(b) }
+    val dsGrouped: KeyValueGroupedDataset[Foo, (Foo, Bar)] = dsFooBar.groupByKey(_._1) // we want Foos with all their Bars
+    val dsGroupedMapped: KeyValueGroupedDataset[Foo, Option[Bar]] =  dsGrouped.mapValues(toBars) //we don't need the Foos in the values because we have them in the keys
+
+    // If the schema is inferred from a Scala tuple/case class, or a Java bean, please try to use scala.Option[_] or other nullable types (e.g. java.lang.Integer instead of int/scala.Int).
+//    dsGroupedMapped.mapGroups ( (foo:Foo, bars:Iterator[Bar]) => foo -> bars.toList).show //Baaaam explodes because (I think) Foo("x") has no Bar
+
+    val foo2Bars: (Foo, Iterator[Option[Bar]]) => List[(Foo, Bar)] = { case (f, bs) => bs.toList.flatten.map { x => f -> x } }
+
+    dsGroupedMapped.flatMapGroups ( foo2Bars ).show //Baaaam explodes because (I think) Foo("x") has no Bar
   }
 
 }
