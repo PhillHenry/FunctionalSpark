@@ -7,17 +7,7 @@ import scalaz._
   * Stolen from http://www.stephenzoio.com/creating-composable-data-pipelines-spark/
   */
 sealed trait SparkOperation[+A] {
-  // executes the transformations
   def run(ctx: SparkContext): A
-
-  // note you don't have to implement these (as Stephen Zoio indeed says) but you do need:
-  // import scalaz.syntax.functor._
-  // anywhere that needs map/flatMap instead.
-  // enables chaining pipelines, for comprehensions, etc.
-//  def map[B](f: A ⇒ B): SparkOperation[B] =
-//    SparkOperation { ctx ⇒ f(this.run(ctx)) }
-//  def flatMap[B](f: A ⇒ SparkOperation[B]): SparkOperation[B] =
-//    SparkOperation { ctx ⇒ f(this.run(ctx)).run(ctx) }
 }
 
 object SparkOperation {
